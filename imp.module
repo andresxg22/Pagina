@@ -1,0 +1,50 @@
+<?php
+/**
+*implementacion de modulo
+*/
+function imp_menu(){
+$items['imp']=array(
+'title'=>'Graficas De Indicadores Sobre Electricity production from oil sources (kWh)',
+'description'=>'Imprecion de Indicador',
+'page callback'=>'indicadores',
+'type'=>MENU_NORMAL_ITEM,
+'access callback'=>TRUE,
+);
+return $items;
+}
+function indicadores(){
+$resultado=drupal_http_request("http://api.worldbank.org/countries/COL/indicators/EG.ELC.PETR.KH?per_page=10&date=2003:2007");
+$datos==$resultado->data;
+$hola=simplexml_load_string($resultado->data);
+$cadena="";
+$cadena2="";
+$xx=0;
+foreach($hola->children('http://www.worldbank.org')->data as $dato)
+{
+$fecha=$dato->date;
+$indica=$dato->indicator;
+$sitio=$dato->country;
+$valor=$dato->value;
+if ($xx==0)
+{
+$cadena="$valor";
+$cadena2="$fecha";
+}
+
+if ($xx==1)
+{
+$cadena="$cadena".","."$valor";
+$cadena2="$cadena2"."|"."$fecha";
+}
+$xx=1;
+}
+//print $cadena;
+//print $cadena2;
+//$impre="Graficas del Indicador"."\n"."\n"."\n"."<center><img src='http://chart.apis.google.com/chart?chxl=1:|$cadena2&chxr=0,0,7000|1,0,105&chxt=y,x&chbh=a&chs=440x289&cht=bvg&chco=3A5EC1&chds=0,7000&chd=t:$cadena2&chma=0,5&chtt=DIAGRAMA%20DE%20BARRAS'/'/>";
+$impre="Graficas del Indicador"."\n"."\n"."\n"."<center><img src='http://chart.apis.google.com/chart?cht=p3&chd=t:$cadena&chs=440x200&chl=$cadena2&chco=0000FF&chtt=Diagrama%20de%20Tarta'/>"."\n"."<img src='http://chart.apis.google.com/chart?chxl=1:|$cadena2&chxr=0,0,160000000|1,0,105&chxt=y,x&chbh=a&chs=440x289&cht=bvg&chco=3A5EC1&chds=0,151000000&chd=t:$cadena&chma=0,5&chtt=Diagrama%20de%20Barras'/>";
+return ($impre);
+}
+
+
+
+
